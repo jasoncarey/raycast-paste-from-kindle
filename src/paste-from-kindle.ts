@@ -1,15 +1,12 @@
 import { Clipboard } from "@raycast/api";
 
-export default function Command() {
-  return (async () => {
-    const clipboard = (await Clipboard.readText()) || "";
-    const re = new RegExp(/^([\s\S]+?)\r?\n\r?\n/);
-    const match = clipboard.match(re);
+export default async function Command() {
+  const clipboard = (await Clipboard.readText()) || "";
 
-    if (match) {
-      Clipboard.paste(match[0]);
-    } else {
-      Clipboard.paste(clipboard);
-    }
-  })();
+  // Clean everything before the first double line break
+  const match = clipboard.match(/^([\s\S]+?)\r?\n\r?\n/);
+  const cleaned = match ? match[1].trim() : clipboard;
+
+  await Clipboard.copy(cleaned);
+  await Clipboard.paste(cleaned);
 }
